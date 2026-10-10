@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Telegram Web K 表情包彻底抹除 (智能无误伤版)
 // @namespace    http://tampermonkey.net/
-// @version      8.4
+// @version      8.5
 // @description  只抹除纯表情包消息。如果消息中包含文字内容，则完整保留。
 // @author       User
 // @match        https://web.telegram.org/k/*
@@ -58,13 +58,20 @@
             display: flex !important;
         }
 
-        /* 屏蔽“纯 emoji 放大”消息：整条消息只有 emoji、无文字，被放大显示
-           Web K 会给这类气泡打 is-emoji 类，含文字的 emoji 消息不受影响。
+        /* 屏蔽“纯 emoji 放大”消息：整条消息只有 emoji、无文字，被放大显示。
+           Web K 真实类名是 emoji-big（tweb 源码 messageRender.ts 实证，is-emoji 不存在）。
            注意：必须放在保护补丁之后 —— 此类气泡含 .message，保护补丁会命中，
            特异性同为 (0,4,0) 时靠后的规则生效。
            如想保留纯 emoji 消息，删除本规则块即可 */
-        .bubble.is-emoji:has(.message):not(.sticker) {
+        .bubble.emoji-big:has(.message):not(.sticker) {
             display: none !important;
+        }
+
+        /* 保护骰子/飞镖/老虎机等游戏消息：data-dice 属性是精确标识（tweb 源码 dice.ts 实证），
+           骰子复用贴纸渲染管线（wrapSticker），会被上面的规则误杀。
+           双写 .bubble 将特异性提升至 (0,3,0)，且位于所有隐藏规则之后 */
+        .bubble.bubble[data-dice] {
+            display: flex !important;
         }
     `);
 })();
