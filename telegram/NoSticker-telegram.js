@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Telegram Web K 表情包彻底抹除 (智能无误伤版)
 // @namespace    http://tampermonkey.net/
-// @version      8.5
+// @version      8.6
 // @description  只抹除纯表情包消息。如果消息中包含文字内容，则完整保留。
 // @author       User
 // @match        https://web.telegram.org/k/*
@@ -67,11 +67,7 @@
             display: none !important;
         }
 
-        /* 保护骰子/飞镖/老虎机等游戏消息：data-dice 属性是精确标识（tweb 源码 dice.ts 实证），
-           骰子复用贴纸渲染管线（wrapSticker），会被上面的规则误杀。
-           双写 .bubble 将特异性提升至 (0,3,0)，且位于所有隐藏规则之后 */
-        .bubble.bubble[data-dice] {
-            display: flex !important;
-        }
+        /* 说明：骰子/飞镖/老虎机（data-dice 属性）复用贴纸渲染管线，会被上面规则一并屏蔽。
+           这是预期行为 —— 如需保留骰子，在此追加 .bubble.bubble[data-dice] { display: flex !important; } */
     `);
 })();
